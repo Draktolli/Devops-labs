@@ -1,0 +1,24 @@
+version: '3.9'
+
+services:
+  openssl:
+    build: openssl
+    container_name: openssl_sidecar
+    volumes:
+      - cert_volume:/certs
+  app:
+    build: .
+    container_name: app
+    depends_on:
+      openssl:
+        condition: service_started
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./static:/usr/share/nginx/html
+      - ./nginx.conf:/usr/local/nginx/conf/nginx.conf
+      - cert_volume:/certs:ro
+volumes:
+  cert_volume:
