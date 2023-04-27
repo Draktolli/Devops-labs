@@ -1,0 +1,32 @@
+version: "3.4"
+
+services:
+    springboot-backend:
+        build:
+            context: ./springboot-backend/
+        depends_on:
+            - db
+        environment:
+            - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/employee_management_system?useSSL=false&createDatabaseIfNotExist=true
+            - SPRING_DATASOURCE_USERNAME=root
+            - SPRING_DATASOURCE_PASSWORD=somepassword
+        volumes:
+            - ./backend-config:/config
+    angular-frontend:
+        build:
+            context: ./angular-frontend/
+        depends_on:
+            - springboot-backend
+        ports:
+            - 80:80
+            - 8080:8080
+        volumes:
+            - ./frontend-config:/config
+    db:
+        image: "mysql:5.6"
+        environment:
+            - MYSQL_ROOT_PASSWORD=somepassword
+        volumes:
+            - db-data:/var/lib/mysql
+volumes:
+    db-data:
